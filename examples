@@ -1,7 +1,3 @@
-Welcome to my PoC page! 
-
-Here is an example of how I "diagnose bugs/code errors", so you can view exactly what you are dealing with when it comes to my services.
-
 Example Error: 
 
 Cannot find module '@/components/Navbar'
@@ -13,43 +9,12 @@ Require stack:
 
 Diagnostic: 
 
-Alright — I can see exactly why this is blowing up.
-The import path @/components/Navbar is using a path alias (@/) that hasn’t actually been defined anywhere in the project.
-Here’s what’s happening under the hood:
-Next.js hands the import to Webpack
-Webpack checks your tsconfig.json or jsconfig.json for path aliases
-It looks for a mapping for @/*
-It finds nothing
-So it has no idea where @/components/Navbar is supposed to live
-The module resolver gives up and throws the error you’re seeing
-In other words:
-Your code is using a shortcut that the build system doesn’t understand.
-This is why it works on some machines (like macOS) but fails instantly in CI or production.
-Root Cause
-The alias @/ is missing from your config.
-Or the file components/Navbar doesn’t exist at the expected path.
-Fix
-To resolve this cleanly:
-Open tsconfig.json or jsconfig.json
-Add the correct alias mapping:
-json
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./*"]
-    }
-  }
-}
-Ensure the file actually exists at:
-Code
-/components/Navbar.(js|tsx)
-Clear .next cache
-Rebuild
-Once the alias is defined, the resolver knows exactly where to look — and the error disappears.
-Outcome
-Build succeeds.
-Component loads correctly.
-No more module resolution failures.
+Damn, okay... I see exactly what's going on here. It's frustrating, but the real reason this is blowing up is that we've told the build system to look for a component in a place that technically doesn't exist yet.
+Here's the physics of the bug: You're importing the Navbar using that @/components/Navbar alias. Next.js, acting on behalf of Webpack, sees that alias (@/) and turns to its configurations (your tsconfig.json or jsconfig.json) to ask, "Hey, what does @/ mean in our file system?"
+When the scan says the Path alias '@/' unresolved, it means the build system looked in the configuration file, found a blank map, and concluded that the alias doesn't point anywhere. Since it doesn't know where @/ lives, it definitely can't find components/Navbar inside it. In short, your code is using a shortcut that hasn't been defined yet, creating a massive broken reference the moment it tries to compile index.js.
+To win next time, we need to explicitly connect those dots before the system starts looking. If your file is actually at /app/components/Navbar, we must configure the path alias correctly. First, we set the "baseUrl" to "." (root), and then we tell the compiler, "Listen, when I say @/ anywhere in my import statements, I actually mean, 'Look at the root of this project and start from there.'" This immediately turns that broken link into a real file path and satisfies the build.
+Alternatively, if that Navbar component file doesn't even exist yet, you've just got to make it. All the path aliases in the world won't help you if the physical file isn't on the disk.
 
-Thank you for reading!
+Upon recieving the diagnostic, you are resposible for implementing the fix yourslef without my assitance. 
+
+Thank you!
