@@ -1,0 +1,55 @@
+Welcome to my PoC page! 
+
+Here is an example of how I "diagnose bugs/code errors", so you can view exactly what you are dealing with when it comes to my services.
+
+Example Error: 
+
+Cannot find module '@/components/Navbar'
+Require stack:
+- /app/.next/server/pages/index.js
+- /app/node_modules/next/dist/server/require.js
+- /app/node_modules/next/dist/server/load-components.js
+- /app/node_modules/next/dist/server/api-utils/node.js
+
+Diagnostic: 
+
+Alright — I can see exactly why this is blowing up.
+The import path @/components/Navbar is using a path alias (@/) that hasn’t actually been defined anywhere in the project.
+Here’s what’s happening under the hood:
+Next.js hands the import to Webpack
+Webpack checks your tsconfig.json or jsconfig.json for path aliases
+It looks for a mapping for @/*
+It finds nothing
+So it has no idea where @/components/Navbar is supposed to live
+The module resolver gives up and throws the error you’re seeing
+In other words:
+Your code is using a shortcut that the build system doesn’t understand.
+This is why it works on some machines (like macOS) but fails instantly in CI or production.
+Root Cause
+The alias @/ is missing from your config.
+Or the file components/Navbar doesn’t exist at the expected path.
+Fix
+To resolve this cleanly:
+Open tsconfig.json or jsconfig.json
+Add the correct alias mapping:
+json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
+Ensure the file actually exists at:
+Code
+/components/Navbar.(js|tsx)
+Clear .next cache
+Rebuild
+Once the alias is defined, the resolver knows exactly where to look — and the error disappears.
+Outcome
+Build succeeds.
+Component loads correctly.
+No more module resolution failures.
+
+Thank you for reading!
