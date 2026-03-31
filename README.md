@@ -9,4 +9,4 @@ I offer SRE-level debugging for any codebase.
 
 If you have an error, crash, failing build, or broken deployment, I can fix it.
 
-📩 Open an issue here: https://github.com/wencopywrite-stack/debugging-service
+Open an issue here: https://github.com/wencopywrite-stack/debugging-service!
