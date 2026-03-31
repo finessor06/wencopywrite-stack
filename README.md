@@ -5,7 +5,7 @@ I offer SRE-level debugging for any codebase.
 ✔ Any stack  
 ✔ Any logs  
 ✔ Guaranteed diagnosis  
-✔ $100 flat per issue  
+✔ $100USD flat per issue  
 
 If you have an error, crash, failing build, or broken deployment, I can fix it.
 
